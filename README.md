@@ -79,12 +79,4 @@ This project leverages advances in AI and computer vision to overcome these limi
 - Ahonen, T., Hadid, A., & Pietikainen, M. (2006). Face Description with Local Binary Patterns: Application to Face Recognition. *IEEE Transactions on Pattern Analysis and Machine Intelligence*, 28(12), 2037–2041.
 - Bulbul, A., Costa, A. D., Islam, R., & Murad, R. (2019). Smart Attendance System Using Image Processing. *International Conference on Computer and Information Technology*.
 
-## 👤 Author
-**Sothinathan Ramanan**  
-Student No: CS/2019/054  
-Email: [Your Email Here]  
-LinkedIn: [Your LinkedIn Profile]  
-GitHub: [Your GitHub Profile]
-
----
 
