@@ -50,6 +50,31 @@ This project leverages advances in AI and computer vision to overcome these limi
 - **Databases:** SQL/NoSQL (for attendance records)
 - **Tools:** OpenCV (image/video processing), NumPy, Scikit-learn (metrics and evaluation)
 
+## 📦 Major Libraries and Dependencies
+
+This project utilizes several powerful libraries and tools for efficient facial recognition, image processing, and machine learning. Below is a brief description of each major dependency:
+
+- **Python**  
+  The primary programming language for the project, known for its simplicity and extensive ecosystem for scientific computing, machine learning, and web development.
+
+- **CMake**  
+  A cross-platform build system generator. It is mainly used to manage the build process of software and is required for compiling some dependencies like dlib.
+
+- **NumPy**  
+  A fundamental package for scientific computing in Python. It provides support for large, multi-dimensional arrays and matrices, along with a collection of mathematical functions to operate on these arrays.
+
+- **face-recognition**  
+  A Python library built on top of dlib for easy and accurate facial recognition. It provides simple APIs for face detection, face encoding, and face comparison.
+
+- **dlib**  
+  A modern C++ toolkit containing machine learning algorithms and tools for creating complex software in C++ to solve real-world problems. In this project, it is used for face detection and facial feature extraction.
+
+- **OpenCV**  
+  An open-source computer vision and machine learning library. It is widely used for real-time image and video processing tasks, including face detection and manipulation.
+
+- **scikit-learn**  
+  A popular machine learning library in Python. It provides simple and efficient tools for data mining and data analysis, including various metrics for model evaluation.
+
 ## 🔐 Ethical Considerations
 - Obtain **explicit user consent** before collecting facial data.
 - Ensure **data privacy** via encryption and secure access controls.
