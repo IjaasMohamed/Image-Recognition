@@ -23,3 +23,11 @@ while True:
         bottom_pos=bottom_pos*4
         left_pos = left_pos*4
         print('Found face {} at top:{},right:{},bottom:{},left:{}'.format(index+1,top_pos,right_pos,bottom_pos,left_pos))
+        cv2.rectangle(current_frame, (left_pos,top_pos), (right_pos, bottom_pos),(0,0,255),2)
+        cv2.imshow("Webcam Video", current_frame)
+        
+    if cv2.waitKey(1) & OxFF == ord('q'):
+        break
+    
+webcam_vedio_stream.release()
+cv2.destroyAllWindows()
