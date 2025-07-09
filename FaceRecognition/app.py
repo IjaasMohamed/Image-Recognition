@@ -13,6 +13,7 @@ from detection.face_matching import detect_faces, align_face
 from detection.face_matching import extract_features, match_face
 from utils.configuration import load_yaml
 
+matched_student_name = None
 config_file_path = load_yaml("configs/database.yaml")
 
 TEACHER_PASSWORD_HASH = config_file_path["teacher"]["password_hash"]
@@ -67,7 +68,8 @@ def match_with_database(img, database):
     '''The function "match_with_database" takes an image and a database as input, detects faces in the
     image, aligns and extracts features from each face, and matches the face to a face in the database.
     '''
-    global match
+    global matched_student_name  # Use a more descriptive global variable name
+    
     # Detect faces in the frame
     faces = detect_faces(img)
 
@@ -89,16 +91,17 @@ def match_with_database(img, database):
             embedding = embedding[0]["embedding"]
 
             # Match the face to a face in the database
-            match = match_face(embedding, database)
+            match_result = match_face(embedding, database)
 
-            if match is not None:
-                return f"Match found: {match}"
+            if match_result is not None:
+                matched_student_name = match_result  # Store the matched name globally
+                return f"Match found: {match_result}"
             else:
+                matched_student_name = None
                 return "No match found"
         except:
+            matched_student_name = None
             return "No face detected"
-        # break # TODO: remove this line to detect all faces in the frame
-
 
 app = Flask(__name__, template_folder="template")
 app.secret_key = "123456"  # Add this line
@@ -318,6 +321,8 @@ def recognize():
 
 @app.route("/select_class", methods=["GET", "POST"])
 def select_class():
+    global matched_student_name  # Access the global variable
+    
     if request.method == "POST":
         # Get the selected class from the form data
         selected_class = request.form.get("classes")
@@ -326,6 +331,10 @@ def select_class():
         timestamp = datetime.now().strftime("%Y%m%d%H%M%S")  # for browser cache
         url = url_for("static", filename="recognized/recognized.png", v=timestamp)
 
+        # Check if we have a matched student
+        if matched_student_name is None:
+            return f'<h2>No student recognized for class: {selected_class}</h2><img src="{url}" alt="Recognized face">'
+
         # Information to database
         ref = db.reference("Students")
         # Obtain the last studentId number from the database
@@ -333,22 +342,25 @@ def select_class():
 
         for i in range(1, number_student):
             studentInfo = db.reference(f"Students/{i}").get()
-            if match == studentInfo["name"]:
-                # Check if the selceted class is in the list of studentInfo['classes']
+            if matched_student_name == studentInfo["name"]:  # Use the global variable
+                # Check if the selected class is in the list of studentInfo['classes']
                 print(studentInfo["classes"])
                 if selected_class in studentInfo["classes"]:
                     # Update the attendance in the database
-                    ref.child(f"{i}/classes/{selected_class}").set(
-                        int(studentInfo.get("classes", {}).get(selected_class)) + 1
-                    )
+                    current_attendance = int(studentInfo.get("classes", {}).get(selected_class, 0))
+                    ref.child(f"{i}/classes/{selected_class}").set(current_attendance + 1)
                     # Render the template, passing the detection result and image URL
-                    return f'<h2>Selected Class: {selected_class} - {detection}</h2><img src="{url}" alt="Recognized face">'
+                    return f'<h2>Attendance marked for {matched_student_name} in {selected_class}</h2><img src="{url}" alt="Recognized face">'
                 else:
-                    return f'<h2>Student not in class - {detection}</h2><img src="{url}" alt="Recognized face">'
+                    return f'<h2>Student {matched_student_name} not enrolled in class {selected_class}</h2><img src="{url}" alt="Recognized face">'
+        
+        # If we reach here, the student wasn't found in the database
+        return f'<h2>Student {matched_student_name} not found in database</h2><img src="{url}" alt="Recognized face">'
+    
     else:
         # Render the select class page
         return render_template("select_class.html")
-
+    
 
 def gen_frames():
     global video
