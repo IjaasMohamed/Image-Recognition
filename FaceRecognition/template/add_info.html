@@ -45,28 +45,15 @@
 </head>
 <body>
     <form action="/submit_info" method="post">
-        <h3> Please Enter Your Informations </h3>
+        <h3>Please Enter Your Information</h3>
         <input type="text" name="name" placeholder="Enter your name" required>
         <input type="email" name="email" placeholder="Enter your email" required>
         <select name="userType" required>
             <option value="">Select your user type</option>
-            <option value="student">Student</option>
+            <option value="employee">Employee</option> <!-- Updated to employee instead of student -->
             <option value="teacher">Teacher</option>
         </select>
-        <select name="classes" multiple required>
-            <option value="">Select your classes</option>
-            <option value="CS">Introduction to Computer Science</option>
-            <option value="Robotics">Introduction to Robotics</option>
-            <option value="Data">Data Structures</option>
-            <option value="Algorithms">Algorithms</option>
-            <option value="AI">Artificial Intelligence</option>
-            <option value="ML">Machine Learning</option>
-            <option value="DL">Deep Learning</option>
-            <option value="CV">Computer Vision</option>
-            <option value="NLP">Natural Language Processing</option>
-            <option value="BD">Big Data</option>
-            <option value="DS">Data Science</option>
-        </select>        
+        <!-- Removed class selection -->
         <input type="password" name="password" placeholder="Enter your password" required>
         <input type="submit" value="Submit">
     </form>

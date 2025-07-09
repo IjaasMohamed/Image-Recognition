@@ -161,15 +161,17 @@ def extract_features(face):
     Returns
     -------
         the embedding of the face, which is a numerical representation of the face's features.
-
     '''
     # Convert the face to RGB color format
     face_rgb = cv2.cvtColor(face, cv2.COLOR_BGR2RGB)
 
-    # Use the DeepFace model to predict the embedding
-    embedding = DeepFace.represent(face_rgb, model_name="Facenet")
-
-    return embedding
+    # Use the DeepFace model to predict the embedding with enforce_detection=False
+    try:
+        embedding = DeepFace.represent(face_rgb, model_name="Facenet", enforce_detection=False)
+        return embedding
+    except ValueError as e:
+        print("Error extracting features:", e)
+        return None
 
 
 def match_face(embedding, database):

@@ -144,7 +144,7 @@ def attendance():
             studentInfo["name"],
             studentInfo["email"],
             studentInfo["userType"],
-            studentInfo["classes"],
+           studentInfo["attendanceStatus"],
         ]
     return render_template("attendance.html", students=students)
 
@@ -257,8 +257,8 @@ def submit_info():
     name = request.form.get("name")
     email = request.form.get("email")
     userType = request.form.get("userType")
-    classes = request.form.getlist("classes")  # Get all selected classes
     password = request.form.get("password")
+    attendanceStatus = "Out"  # Default attendance status
 
     # Get the last uploaded image
     studentId, _ = os.path.splitext(filename)
@@ -268,13 +268,21 @@ def submit_info():
     # Detect faces in the image
     faces = detect_faces(data)
 
+    # Explicitly check if faces is empty
+    if len(faces) == 0:
+        return "<h2>No face detected. Please upload a clearer image with a visible face.</h2>"
+
+    # Process each face (in case there are multiple faces, though unlikely)
     for face in faces:
         # Align the face
         aligned_face = align_face(data, face)
 
         # Extract features from the face
         embedding = extract_features(aligned_face)
-        break
+        if embedding is None:
+            return "<h2>Error in face recognition. Please ensure the image contains a clear face.</h2>"
+
+        break  # Assuming the first face is the one we want
 
     # Add the information to the database
     ref = db.reference("Students")
@@ -283,7 +291,7 @@ def submit_info():
             "name": name,
             "email": email,
             "userType": userType,
-            "classes": {class_: int("0") for class_ in classes},
+            "attendanceStatus": attendanceStatus,
             "password": password,
             "embeddings": embedding[0]["embedding"],
         }
@@ -297,7 +305,7 @@ def submit_info():
 
 @app.route("/recognize", methods=["GET", "POST"])
 def recognize():
-    global detection
+    global matched_student_name
     ret, frame = video.read()
     if ret:
         # Information to database
@@ -315,52 +323,23 @@ def recognize():
 
         detection = match_with_database(frame, database)
 
-    # Return a successful response
-    return redirect(url_for("select_class"))
+        if matched_student_name:
+            # Mark attendance as "In"
+            student_ref = db.reference(f"Students/{i}")
+            student_ref.update({"attendanceStatus": "In"})
+            return f'<h2>Attendance marked as "In" for {matched_student_name}</h2>'
+        else:
+            # Display "Not Registered" message for unrecognized faces
+            return "<h2>Not Registered</h2>"
+
+    return redirect(url_for("home"))
 
 
 @app.route("/select_class", methods=["GET", "POST"])
 def select_class():
-    global matched_student_name  # Access the global variable
-    
-    if request.method == "POST":
-        # Get the selected class from the form data
-        selected_class = request.form.get("classes")
+    # Remove this function entirely as we no longer need class selection.
+    pass
 
-        # Generate the URL of the image
-        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")  # for browser cache
-        url = url_for("static", filename="recognized/recognized.png", v=timestamp)
-
-        # Check if we have a matched student
-        if matched_student_name is None:
-            return f'<h2>No student recognized for class: {selected_class}</h2><img src="{url}" alt="Recognized face">'
-
-        # Information to database
-        ref = db.reference("Students")
-        # Obtain the last studentId number from the database
-        number_student = len(ref.get())
-
-        for i in range(1, number_student):
-            studentInfo = db.reference(f"Students/{i}").get()
-            if matched_student_name == studentInfo["name"]:  # Use the global variable
-                # Check if the selected class is in the list of studentInfo['classes']
-                print(studentInfo["classes"])
-                if selected_class in studentInfo["classes"]:
-                    # Update the attendance in the database
-                    current_attendance = int(studentInfo.get("classes", {}).get(selected_class, 0))
-                    ref.child(f"{i}/classes/{selected_class}").set(current_attendance + 1)
-                    # Render the template, passing the detection result and image URL
-                    return f'<h2>Attendance marked for {matched_student_name} in {selected_class}</h2><img src="{url}" alt="Recognized face">'
-                else:
-                    return f'<h2>Student {matched_student_name} not enrolled in class {selected_class}</h2><img src="{url}" alt="Recognized face">'
-        
-        # If we reach here, the student wasn't found in the database
-        return f'<h2>Student {matched_student_name} not found in database</h2><img src="{url}" alt="Recognized face">'
-    
-    else:
-        # Render the select class page
-        return render_template("select_class.html")
-    
 
 def gen_frames():
     global video

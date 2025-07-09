@@ -47,20 +47,17 @@
             <th>Name</th>
             <th>Email</th>
             <th>Type</th>
-            <th>Classes and Attendance</th>
+            <th>Attendance Status</th> <!-- Change column name to reflect attendance status -->
         </tr>
         {% for student in students.values() %}
             <tr>
                 <td>{{ student[0] }}</td>
                 <td>{{ student[1] }}</td>
                 <td>{{ student[2] }}</td>
-                <td>
-                    {% for class_, attendance in student[3].items() %}
-                        {{ class_ }}: {{ attendance }}<br>
-                    {% endfor %}
-                </td>
+                <td>{{ student[3] }}</td> <!-- Display attendance status instead of class details -->
             </tr>
         {% endfor %}
     </table>
 </body>
+</html>
 </html>
