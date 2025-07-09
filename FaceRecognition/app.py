@@ -307,12 +307,10 @@ def submit_info():
 def recognize():
     global matched_student_name
     ret, frame = video.read()
+    
     if ret:
-        # Information to database
         ref = db.reference("Students")
-        # Obtain the last studentId number from the database
         number_student = len(ref.get())
-        print("There are", (number_student - 1), "students in the database")
 
         database = {}
         for i in range(1, number_student):
@@ -324,21 +322,35 @@ def recognize():
         detection = match_with_database(frame, database)
 
         if matched_student_name:
-            # Mark attendance as "In"
+            # Retrieve the current attendance status
             student_ref = db.reference(f"Students/{i}")
-            student_ref.update({"attendanceStatus": "In"})
-            return f'<h2>Attendance marked as "In" for {matched_student_name}</h2>'
+            student_info = student_ref.get()
+            current_status = student_info.get("attendanceStatus", "Out")
+
+            # Toggle attendance status
+            if current_status == "In":
+                new_status = "Out"
+            else:
+                new_status = "In"
+
+            # Update the attendance status and the current time
+            current_time = datetime.now().strftime("%I:%M %p")
+            student_ref.update({
+                "attendanceStatus": new_status,
+                "attendanceTime": current_time  # Store the time when the attendance is marked
+            })
+
+            # Return the status and time to the frontend
+            return {
+                "status": new_status,
+                "name": matched_student_name,
+                "time": current_time
+            }
         else:
-            # Display "Not Registered" message for unrecognized faces
-            return "<h2>Not Registered</h2>"
+            # If no student matched, return an error response
+            return {"status": "Not Registered"}
 
-    return redirect(url_for("home"))
-
-
-@app.route("/select_class", methods=["GET", "POST"])
-def select_class():
-    # Remove this function entirely as we no longer need class selection.
-    pass
+    return redirect(url_for("home"))  # If no face detected, return home or another page.
 
 
 def gen_frames():
