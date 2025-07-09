@@ -30,32 +30,39 @@ firebase_admin.initialize_app(
 
 
 def upload_database(filename):
-    """
-    Checks if a file with the given filename already exists in the
-    database storage, and if not, uploads the file to the database.
-    """
-    valid = False
-    # If the fileName exists in the database storage, then continue
-    if storage.bucket().get_blob(filename):
-        valid = True
-        error = f"<h1>{filename} already exists in the database</h1>"
-
-    # First check if the name of the file is a number
-    if not filename[:-4].isdigit():
-        valid = True
-        error = f"<h1>Please make sure that the name of the {filename} is a number</h1>"
-
-    if not valid:
-        # Image to database
-        filename = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+    try:
         bucket = storage.bucket()
+        
+        # Check if file already exists in Firebase Storage
+        if bucket.get_blob(filename):
+            error = f"<h1>{filename} already exists in the database</h1>"
+            return True, error
+
+        # Check if filename (without extension) is a number
+        if not filename[:-4].isdigit():
+            error = f"<h1>Please make sure that the name of the {filename} is a number</h1>"
+            return True, error
+
+        # Local file path (where the file is stored on your server)
+        local_file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+        
+        # Check if local file exists
+        if not os.path.exists(local_file_path):
+            error = f"<h1>Local file {filename} not found</h1>"
+            return True, error
+        
+        # Firebase Storage path (just the filename)
         blob = bucket.blob(filename)
-        blob.upload_from_filename(filename)
-        error = None
-
-    return valid, error
-
-
+        
+        # Upload the file from local path to Firebase Storage
+        blob.upload_from_filename(local_file_path)
+        
+        return False, None  # Success
+        
+    except Exception as e:
+        error = f"<h1>Error uploading to Firebase: {str(e)}</h1>"
+        return True, error
+    
 def match_with_database(img, database):
     '''The function "match_with_database" takes an image and a database as input, detects faces in the
     image, aligns and extracts features from each face, and matches the face to a face in the database.

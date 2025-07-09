@@ -2,5 +2,5 @@ teacher:
   password_hash: pbkdf2:sha256:150000$KnMgkMl8$cae7b48e68ebe2e49e135ea66013797d588ebea10a0c736547ef329e0fb32cee
 firebase:
   databaseURL: "https://imagerecognition-af3ce-default-rtdb.firebaseio.com/"
-  storageBucket: "gs://imagerecognition-af3ce.firebasestorage.app"
+  storageBucket: "imagerecognition-af3ce.firebasestorage.app"
   pathToServiceAccount: "C://Projects//FaceRecognition//configs//serviceAccountKey.json"

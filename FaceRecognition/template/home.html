@@ -3,58 +3,301 @@
 <head>
     <title>Face Recognition</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f0f0f0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
         }
+        
         #header {
-            background-color: #333;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
-            padding: 10px 0;
+            padding: 20px 0;
             text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
         }
+        
+        #header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)" /></svg>');
+            opacity: 0.3;
+        }
+        
         #header img {
             height: 60px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
+        
         #header h1 {
             display: inline;
             margin-left: 20px;
             vertical-align: middle;
+            font-size: 2.2rem;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
         }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+            display: flex;
+            gap: 30px;
+            min-height: calc(100vh - 120px);
+        }
+        
         #left-column {
-            float: left;
-            width: 25%;
-            padding: 20px;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease;
         }
+        
+        #left-column:hover {
+            transform: translateY(-5px);
+        }
+        
         #right-column {
-            float: right;
-            width: 65%;
-            padding: 20px;
+            flex: 2;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease;
         }
+        
+        #right-column:hover {
+            transform: translateY(-5px);
+        }
+        
+        h2 {
+            color: #2a5298;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+        
+        h3 {
+            color: #555;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        
+        p {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            color: #2d3436;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin: 15px 0;
+            border-left: 4px solid #e17055;
+            box-shadow: 0 4px 12px rgba(231, 112, 85, 0.2);
+        }
+        
+        form {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px dashed #667eea;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+        
+        form:hover {
+            border-color: #2a5298;
+            background: #f1f3f4;
+        }
+        
+        input[type="file"] {
+            background: white;
+            border: 2px solid #ddd;
+            padding: 12px;
+            border-radius: 10px;
+            width: 100%;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        input[type="file"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        button, input[type="submit"] {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 10px 0;
+            width: 100%;
+        }
+        
+        button:hover, input[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, #5a67d8 0%, #667eea 100%);
+        }
+        
+        button:active, input[type="submit"]:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        #recognize-button {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            box-shadow: 0 8px 20px rgba(0, 184, 148, 0.3);
+        }
+        
+        #recognize-button:hover {
+            background: linear-gradient(135deg, #00a085 0%, #00b894 100%);
+            box-shadow: 0 12px 25px rgba(0, 184, 148, 0.4);
+        }
+        
+        button[onclick*="teacher_login"] {
+            background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+            box-shadow: 0 8px 20px rgba(225, 112, 85, 0.3);
+        }
+        
+        button[onclick*="teacher_login"]:hover {
+            background: linear-gradient(135deg, #e17055 0%, #fdcb6e 100%);
+            box-shadow: 0 12px 25px rgba(225, 112, 85, 0.4);
+        }
+        
+        #capture-button {
+            background: linear-gradient(135deg, #e84393 0%, #fd79a8 100%);
+            box-shadow: 0 8px 20px rgba(232, 67, 147, 0.3);
+        }
+        
+        #capture-button:hover {
+            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+            box-shadow: 0 12px 25px rgba(232, 67, 147, 0.4);
+        }
+        
         .video-container {
             position: relative;
             width: 100%;
             padding-top: 60%;
             overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-top: 20px;
+            background: #000;
         }
+        
+        .video-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            z-index: 1;
+            pointer-events: none;
+        }
+        
         #video {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            border-radius: 20px;
+            border: 3px solid #667eea;
         }
-        #footer {
-            clear: both;
-            background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 10px 0;
-            position: fixed;
-            width: 33.5%;
-            bottom: 0;
+        
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        .section:last-child {
+            margin-bottom: 0;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .section {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        .section:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .section:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                padding: 20px;
+            }
+            
+            #header h1 {
+                font-size: 1.8rem;
+                margin-left: 10px;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            button, input[type="submit"] {
+                padding: 12px 25px;
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
@@ -63,32 +306,43 @@
         <h1>Face Detection System for Attendance Marking</h1>
     </div>
 
-    <div id="left-column">
-        <h2>Upload a new face as image</h2>
-        <h3>Click the button below to upload a new face as image</h3>
-        <p>NOTE: This will only work if you are not in our database</p>
-        <form action="/upload" method="post" enctype="multipart/form-data">
-            <input type="file" name="file">
-            <input type="submit" value="Upload">
-        </form>
-        <h2>Add yourself to the attendance list</h2>
-        <h3>Click the button below to recognize your face from the database</h3>
-        <p>NOTE: This will only work if you have already captured a face from the camera</p>
-        <button id="recognize-button">Take Attendance</button>
-        <p>NOTE: If you are a teacher, please click the button below to login to check attendance</p>
-        <button onclick="window.location.href='/teacher_login'">Teacher Login</button>
-    </div>
-    
-    <div id="right-column">
-        <h2>Capture a new face from Camera</h2>
-        <h3>Click the button below to capture a new face from the camera</h3>
-        <p>NOTE: This will only work if you are not in our database</p>
-        <button id="capture-button">Capture</button>
-        <div class="video-container">
-            <iframe id="video" src="/video_feed"></iframe>
+    <div class="container">
+        <div id="left-column">
+            <div class="section">
+                <h2>Upload a new face as image</h2>
+                <h3>Click the button below to upload a new face as image</h3>
+                <p>NOTE: This will only work if you are not in our database</p>
+                <form action="/upload" method="post" enctype="multipart/form-data">
+                    <input type="file" name="file">
+                    <input type="submit" value="Upload">
+                </form>
+            </div>
+            
+            <div class="section">
+                <h2>Add yourself to the attendance list</h2>
+                <h3>Click the button below to recognize your face from the database</h3>
+                <p>NOTE: This will only work if you have already captured a face from the camera</p>
+                <button id="recognize-button">Take Attendance</button>
+            </div>
+            
+            <div class="section">
+                <p>NOTE: If you are a teacher, please click the button below to login to check attendance</p>
+                <button onclick="window.location.href='/teacher_login'">Teacher Login</button>
+            </div>
+        </div>
+        
+        <div id="right-column">
+            <div class="section">
+                <h2>Capture a new face from Camera</h2>
+                <h3>Click the button below to capture a new face from the camera</h3>
+                <p>NOTE: This will only work if you are not in our database</p>
+                <button id="capture-button">Capture</button>
+                <div class="video-container">
+                    <iframe id="video" src="/video_feed"></iframe>
+                </div>
+            </div>
         </div>
     </div>
-
 
     <script>
         document.getElementById('recognize-button').addEventListener('click', function() {
@@ -102,7 +356,6 @@
             };
             xhr.send();
         });
-
     </script>    
 
     <script>
