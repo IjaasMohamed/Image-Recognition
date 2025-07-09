@@ -15,10 +15,8 @@ import face_recognition
 #loading the image to detect
 image_to_detect = cv2.imread('images/testing/trump-modi.jpg')
 
-#face_exp_model = model_from_json(open("dataset/facial_expression_model_structure.json","r",encoding="utf-8").read())
-#face_exp_model.load_weights('dataset/facial_expression_model_weights.h5')
-
-face_exp_model = load_model('dataset/facial_expression_model_combined.h5')
+face_exp_model = model_from_json(open("dataset/facial_expression_model_structure.json","r",encoding="utf-8").read())
+face_exp_model.load_weights('dataset/facial_expression_model_weights.h5')
 
 #declare the emotions label
 emotions_label = ('angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral')
@@ -47,7 +45,7 @@ for index,current_face_location in enumerate(all_face_locations):
     #resize to 48x48 px size
     current_face_image = cv2.resize(current_face_image, (48, 48))
     #convert the PIL image into a 3d numpy array
-    img_pixels = image.img_to_array(current_face_image)
+    img_pixels =  np.expand_dims(current_face_image, axis=-1)
     #expand the shape of an array into single row multiple columns
     img_pixels = np.expand_dims(img_pixels, axis = 0)
     #pixels are in range of [0, 255]. normalize all pixels in scale of [0, 1]
