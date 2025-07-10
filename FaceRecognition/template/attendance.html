@@ -47,14 +47,16 @@
             <th>Name</th>
             <th>Email</th>
             <th>Type</th>
-            <th>Attendance Status</th> <!-- Change column name to reflect attendance status -->
+            <th>Attendance Status</th> 
+            <th>Timestamp</th>
         </tr>
         {% for student in students.values() %}
             <tr>
                 <td>{{ student[0] }}</td>
                 <td>{{ student[1] }}</td>
                 <td>{{ student[2] }}</td>
-                <td>{{ student[3] }}</td> <!-- Display attendance status instead of class details -->
+                <td>{{ student[3] }}</td> 
+                <td>{{ student[4] }}</td>
             </tr>
         {% endfor %}
     </table>

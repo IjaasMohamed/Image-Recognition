@@ -146,7 +146,8 @@ def attendance():
             studentInfo["name"],
             studentInfo["email"],
             studentInfo["userType"],
-           studentInfo["attendanceStatus"],
+            studentInfo["attendanceStatus"],
+            studentInfo["timestamp"]
         ]
     return render_template("attendance.html", students=students)
 
