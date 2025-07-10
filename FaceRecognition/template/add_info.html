@@ -44,18 +44,43 @@
     </style>
 </head>
 <body>
-    <form action="/submit_info" method="post">
-        <h3>Please Enter Your Information</h3>
-        <input type="text" name="name" placeholder="Enter your name" required>
-        <input type="email" name="email" placeholder="Enter your email" required>
-        <select name="userType" required>
-            <option value="">Select your user type</option>
-            <option value="employee">Employee</option> <!-- Updated to employee instead of student -->
-            <option value="teacher">Teacher</option>
-        </select>
-        <!-- Removed class selection -->
-        <input type="password" name="password" placeholder="Enter your password" required>
-        <input type="submit" value="Submit">
-    </form>
+    <form id="infoForm">
+    <h3>Please Enter Your Information</h3>
+    <input type="text" name="name" placeholder="Enter your name" required>
+    <input type="email" name="email" placeholder="Enter your email" required>
+    <select name="userType" required>
+        <option value="">Select your user type</option>
+        <option value="employee">Employee</option>
+        <option value="teacher">Administrator</option>
+    </select>
+    <input type="password" name="password" placeholder="Enter your password" required>
+    <input type="submit" value="Submit">
+</form>
+
+<script>
+    document.getElementById('infoForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        var formData = new FormData(this);
+        var xhr = new XMLHttpRequest();
+
+        xhr.open('POST', '/submit_info', true);
+
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                alert(response.message);
+                if (response.status === "success") {
+                    window.location.href = '/'; // redirect to home page after successful submission
+                }
+            } else {
+                alert('An error occurred while submitting the form.');
+            }
+        };
+
+        xhr.send(formData);
+    });
+</script>
+
 </body>
 </html>

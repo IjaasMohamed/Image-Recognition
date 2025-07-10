@@ -12,6 +12,8 @@ from firebase_admin import storage
 from detection.face_matching import detect_faces, align_face
 from detection.face_matching import extract_features, match_face
 from utils.configuration import load_yaml
+from flask import jsonify
+from datetime import datetime
 
 matched_student_name = None
 config_file_path = load_yaml("configs/database.yaml")
@@ -253,40 +255,33 @@ def success(filename):
 
 @app.route("/submit_info", methods=["POST"])
 def submit_info():
+    global filename
     # Get the form data
     name = request.form.get("name")
     email = request.form.get("email")
     userType = request.form.get("userType")
     password = request.form.get("password")
-    attendanceStatus = "Out"  # Default attendance status
-
+    attendanceStatus = "Out"
+    # Get the current time
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     # Get the last uploaded image
     studentId, _ = os.path.splitext(filename)
     fileName = os.path.join(app.config["UPLOAD_FOLDER"], filename)
     data = cv2.imread(fileName)
 
-    # Detect faces in the image
     faces = detect_faces(data)
-
-    # Explicitly check if faces is empty
     if len(faces) == 0:
-        return "<h2>No face detected. Please upload a clearer image with a visible face.</h2>"
+        return jsonify({"status": "error", "message": "No face detected. Please upload a clearer image with a visible face."})
 
-    # Process each face (in case there are multiple faces, though unlikely)
     for face in faces:
-        # Align the face
         aligned_face = align_face(data, face)
-
-        # Extract features from the face
         embedding = extract_features(aligned_face)
         if embedding is None:
-            return "<h2>Error in face recognition. Please ensure the image contains a clear face.</h2>"
+            return jsonify({"status": "error", "message": "Error in face recognition. Please ensure the image contains a clear face."})
+        break
 
-        break  # Assuming the first face is the one we want
-
-    # Add the information to the database
     ref = db.reference("Students")
-    data = {
+    student_data = {
         str(studentId): {
             "name": name,
             "email": email,
@@ -294,13 +289,15 @@ def submit_info():
             "attendanceStatus": attendanceStatus,
             "password": password,
             "embeddings": embedding[0]["embedding"],
+            "timestamp": timestamp
         }
     }
 
-    for key, value in data.items():
+    for key, value in student_data.items():
         ref.child(key).set(value)
 
-    return redirect(url_for("success", filename=filename))
+    # Return a success JSON response instead of redirecting
+    return jsonify({"status": "success", "message": f"Information for {name} successfully uploaded!"})
 
 
 @app.route("/recognize", methods=["GET", "POST"])
