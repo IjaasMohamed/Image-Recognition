@@ -315,50 +315,37 @@ def recognize():
             studentEmbedding = studentInfo["embeddings"]
             database[studentName] = studentEmbedding
         detection = match_with_database(frame, database)
+
         if matched_student_name:
-            # Find the correct student ID
-            matched_student_id = None
-            for student_id in range(1, number_student):
-                student_info = db.reference(f"Students/{student_id}").get()
-                if student_info and student_info.get("name") == matched_student_name:
-                    matched_student_id = student_id
-                    break
-            if matched_student_id:
-                student_ref = db.reference(f"Students/{matched_student_id}")
-                student_info = student_ref.get()
-                current_status = student_info.get("attendanceStatus", "Out")
-                new_status = "Out" if current_status == "In" else "In"
-                current_time = datetime.now().strftime("%I:%M %p")
-                student_ref.update({
-                    "attendanceStatus": new_status,
-                    "attendanceTime": current_time
-                })
-                # Add entry to AttendanceHistory
-                history_ref = db.reference("AttendanceHistory")
-                try:
-                    history_count = len(history_ref.get()) if history_ref.get() else 0
-                except TypeError:
-                    history_count = 0
-                history_data = {
-                    str(history_count + 1): {
-                        "studentId": str(matched_student_id),
-                        "name": matched_student_name,
-                        "status": new_status,
-                        "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                    }
-                }
-                for key, value in history_data.items():
-                    history_ref.child(key).set(value)
-                return {
-                    "status": new_status,
-                    "name": matched_student_name,
-                    "time": current_time
-                }
+            # Retrieve the current attendance status
+            student_ref = db.reference(f"Students/{i}")
+            student_info = student_ref.get()
+            current_status = student_info.get("attendanceStatus", "Out")
+
+            # Toggle attendance status
+            if current_status == "In":
+                new_status = "Out"
             else:
-                return {"status": "Not Registered"}
+                new_status = "In"
+
+            # Update the attendance status and the current time
+            current_time = datetime.now().strftime("%I:%M %p")
+            student_ref.update({
+                "attendanceStatus": new_status,
+                "attendanceTime": current_time  # Store the time when the attendance is marked
+            })
+
+            # Return the status and time to the frontend
+            return {
+                "status": new_status,
+                "name": matched_student_name,
+                "time": current_time
+            }
         else:
+            # If no student matched, return an error response
             return {"status": "Not Registered"}
-    return redirect(url_for("home"))
+
+    return redirect(url_for("home"))  # If no face detected, return home or another page.
 
 
 def gen_frames():

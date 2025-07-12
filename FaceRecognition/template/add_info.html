@@ -3,84 +3,281 @@
 <head>
     <title>Add Information</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f0f0f0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            color: #333;
         }
-        form {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
-            width: 300px;
+        
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            width: 400px;
+            max-width: 90vw;
+            transition: transform 0.3s ease;
+            animation: fadeIn 0.6s ease-out;
         }
-        h1 {
+        
+        .form-container:hover {
+            transform: translateY(-5px);
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        h3 {
+            color: #2a5298;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            font-weight: 600;
             text-align: center;
-            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+            display: inline-block;
+            width: 100%;
         }
+        
         input, select {
             display: block;
             width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+            background: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
             box-sizing: border-box;
         }
-        input[type="submit"] {
-            background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
         }
+        
+        input::placeholder {
+            color: #999;
+            font-weight: 400;
+        }
+        
+        select {
+            cursor: pointer;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="%23667eea" d="M6 8L2 4h8z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 12px;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+        
+        select option {
+            padding: 10px;
+            background: white;
+            color: #333;
+        }
+        
+        input[type="submit"] {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+            width: 100%;
+        }
+        
         input[type="submit"]:hover {
-            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, #5a67d8 0%, #667eea 100%);
+        }
+        
+        input[type="submit"]:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .form-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .form-group:last-of-type {
+            margin-bottom: 0;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 1.2rem;
+            pointer-events: none;
+        }
+        
+        .input-with-icon {
+            padding-left: 50px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 30px 25px;
+                width: 95vw;
+            }
+            
+            h3 {
+                font-size: 1.5rem;
+            }
+            
+            input, select {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+            
+            input[type="submit"] {
+                padding: 15px 25px;
+                font-size: 1rem;
+            }
+        }
+        
+        /* Loading state styles */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .loading input[type="submit"] {
+            background: linear-gradient(135deg, #999 0%, #666 100%);
+            cursor: not-allowed;
+        }
+        
+        .loading input[type="submit"]:after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
 <body>
-    <form id="infoForm">
-    <h3>Please Enter Your Information</h3>
-    <input type="text" name="name" placeholder="Enter your name" required>
-    <input type="email" name="email" placeholder="Enter your email" required>
-    <select name="userType" required>
-        <option value="">Select your user type</option>
-        <option value="employee">Employee</option>
-        <option value="teacher">Administrator</option>
-    </select>
-    <input type="password" name="password" placeholder="Enter your password" required>
-    <input type="submit" value="Submit">
-</form>
+    <div class="form-container">
+        <form id="infoForm">
+            <h3>Please Enter Your Information</h3>
+            
+            <div class="form-group">
+                <input type="text" name="name" placeholder="Enter your name" required class="input-with-icon">
+                <div class="input-icon">👤</div>
+            </div>
+            
+            <div class="form-group">
+                <input type="email" name="email" placeholder="Enter your email" required class="input-with-icon">
+                <div class="input-icon">📧</div>
+            </div>
+            
+            <div class="form-group">
+                <select name="userType" required class="input-with-icon">
+                    <option value="">Select your user type</option>
+                    <option value="employee">Employee</option>
+                    <option value="teacher">Administrator</option>
+                </select>
+                <div class="input-icon">🏢</div>
+            </div>
+            
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Enter your password" required class="input-with-icon">
+                <div class="input-icon">🔒</div>
+            </div>
+            
+            <input type="submit" value="Submit">
+        </form>
+    </div>
 
-<script>
-    document.getElementById('infoForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        var formData = new FormData(this);
-        var xhr = new XMLHttpRequest();
-
-        xhr.open('POST', '/submit_info', true);
-
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                var response = JSON.parse(xhr.responseText);
-                alert(response.message);
-                if (response.status === "success") {
-                    window.location.href = '/'; // redirect to home page after successful submission
+    <script>
+        document.getElementById('infoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Add loading state
+            const form = this;
+            const submitButton = form.querySelector('input[type="submit"]');
+            const originalValue = submitButton.value;
+            
+            form.classList.add('loading');
+            submitButton.value = 'Submitting...';
+            
+            var formData = new FormData(this);
+            var xhr = new XMLHttpRequest();
+            
+            xhr.open('POST', '/submit_info', true);
+            
+            xhr.onload = function() {
+                // Remove loading state
+                form.classList.remove('loading');
+                submitButton.value = originalValue;
+                
+                if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    alert(response.message);
+                    if (response.status === "success") {
+                        window.location.href = '/'; // redirect to home page after successful submission
+                    }
+                } else {
+                    alert('An error occurred while submitting the form.');
                 }
-            } else {
+            };
+            
+            xhr.onerror = function() {
+                // Remove loading state on error
+                form.classList.remove('loading');
+                submitButton.value = originalValue;
                 alert('An error occurred while submitting the form.');
-            }
-        };
-
-        xhr.send(formData);
-    });
-</script>
-
+            };
+            
+            xhr.send(formData);
+        });
+    </script>
 </body>
 </html>
