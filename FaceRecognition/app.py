@@ -169,6 +169,52 @@ def attendance():
     
     return render_template("attendance.html", students=attendance_history)
 
+@app.route("/download_attendance")
+def download_attendance():
+    import csv
+    from io import StringIO
+    from flask import make_response
+    
+    ref = db.reference("AttendanceHistory")
+    attendance_data = ref.get()
+    
+    # Create CSV content
+    output = StringIO()
+    writer = csv.writer(output)
+    
+    # Write headers
+    writer.writerow(['Name', 'Email', 'Type', 'Attendance Status', 'Timestamp'])
+    
+    if attendance_data:
+        number_records = len(attendance_data)
+        
+        for i in range(1, number_records + 1):
+            try:
+                record = db.reference(f"AttendanceHistory/{i}").get()
+                if record:
+                    # Get student details from Students table
+                    student_id = record["studentId"]
+                    student_info = db.reference(f"Students/{student_id}").get()
+                    
+                    if student_info:
+                        writer.writerow([
+                            record["name"],
+                            student_info["email"],
+                            student_info["userType"],
+                            record["status"],
+                            record["timestamp"]
+                        ])
+            except (KeyError, TypeError):
+                continue
+    
+    # Create response
+    response = make_response(output.getvalue())
+    response.headers["Content-Disposition"] = f"attachment; filename=attendance_history_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+    response.headers["Content-type"] = "text/csv"
+    
+    return response
+
+
 @app.route("/upload", methods=["POST"])
 def upload():
     global filename
