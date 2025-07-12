@@ -136,21 +136,38 @@ def teacher_login():
 
 @app.route("/attendance")
 def attendance():
-    ref = db.reference("Students")
-    number_student = len(ref.get())
-    # attandence
-    students = {}
-    for i in range(1, number_student):
-        studentInfo = db.reference(f"Students/{i}").get()
-        students[i] = [
-            studentInfo["name"],
-            studentInfo["email"],
-            studentInfo["userType"],
-            studentInfo["attendanceStatus"],
-            studentInfo["timestamp"]
-        ]
-    return render_template("attendance.html", students=students)
-
+    ref = db.reference("AttendanceHistory")
+    attendance_data = ref.get()
+    
+    # Initialize empty dictionary for attendance history
+    attendance_history = {}
+    
+    if attendance_data:
+        # Get the number of attendance records
+        number_records = len(attendance_data)
+        
+        # Loop through all attendance records
+        for i in range(1, number_records + 1):
+            try:
+                record = db.reference(f"AttendanceHistory/{i}").get()
+                if record:
+                    # Get student details from Students table
+                    student_id = record["studentId"]
+                    student_info = db.reference(f"Students/{student_id}").get()
+                    
+                    if student_info:
+                        attendance_history[i] = [
+                            record["name"],                    # Position 0 - Name
+                            student_info["email"],             # Position 1 - Email
+                            student_info["userType"],          # Position 2 - Type
+                            record["status"],                  # Position 3 - Status
+                            record["timestamp"]                # Position 4 - Timestamp
+                        ]
+            except (KeyError, TypeError):
+                # Skip if record doesn't exist or is malformed
+                continue
+    
+    return render_template("attendance.html", students=attendance_history)
 
 @app.route("/upload", methods=["POST"])
 def upload():
