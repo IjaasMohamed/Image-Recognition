@@ -3,4 +3,4 @@ teacher:
 firebase:
   databaseURL: "https://imagerecognition-af3ce-default-rtdb.firebaseio.com/"
   storageBucket: "imagerecognition-af3ce.firebasestorage.app"
-  pathToServiceAccount: "C://Projects//FaceRecognition//configs//serviceAccountKey.json"
+  pathToServiceAccount: "C://Projects//FaceRecognition//configs//serviceAccountKeyN.json"
