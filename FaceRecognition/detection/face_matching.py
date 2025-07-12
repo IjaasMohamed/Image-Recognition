@@ -214,3 +214,27 @@ def match_face(embedding, database):
         return match
     else:
         return None
+
+def check_face_exists(new_embedding, database, threshold=0.50):
+    """
+    Check if a face embedding already exists in the database
+    
+    Parameters:
+    -----------
+    new_embedding : list
+        The embedding of the new face to check
+    database : dict
+        Dictionary containing existing face embeddings
+    threshold : float
+        Similarity threshold for matching (default 0.50)
+    
+    Returns:
+    --------
+    tuple: (bool, str or None)
+        Returns (True, matched_name) if face exists, (False, None) if not
+    """
+    for name, db_embedding in database.items():
+        distance = cosine(new_embedding, db_embedding)
+        if distance < threshold:
+            return True, name
+    return False, None

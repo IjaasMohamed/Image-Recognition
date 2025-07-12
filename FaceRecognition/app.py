@@ -296,8 +296,34 @@ def submit_info():
         embedding = extract_features(aligned_face)
         if embedding is None:
             return jsonify({"status": "error", "message": "Error in face recognition. Please ensure the image contains a clear face."})
+        
+        # NEW CODE: Check if face already exists in database
+        ref = db.reference("Students")
+        try:
+            existing_students = ref.get()
+            if existing_students:
+                # Create database for matching
+                database = {}
+                for student_id, student_info in existing_students.items():
+                    if 'embeddings' in student_info:
+                        database[student_info['name']] = student_info['embeddings']
+                
+                # Check if current face matches any existing face
+                match_result = match_face(embedding[0]["embedding"], database)
+                if match_result is not None:
+                    # Delete the uploaded image since registration is not allowed
+                    if os.path.exists(fileName):
+                        os.remove(fileName)
+                    return jsonify({
+                        "status": "error", 
+                        "message": f"Face already registered in the system as '{match_result}'. Duplicate registration not allowed."
+                    })
+        except Exception as e:
+            print(f"Error checking existing faces: {e}")
+        
         break
 
+    # If no match found, proceed with registration
     ref = db.reference("Students")
     student_data = {
         str(studentId): {
@@ -316,7 +342,6 @@ def submit_info():
 
     # Return a success JSON response instead of redirecting
     return jsonify({"status": "success", "message": f"Information for {name} successfully uploaded!"})
-
 
 @app.route("/recognize", methods=["GET", "POST"])
 def recognize():

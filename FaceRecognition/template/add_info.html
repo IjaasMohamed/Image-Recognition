@@ -236,48 +236,30 @@
         </form>
     </div>
 
-    <script>
-        document.getElementById('infoForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Add loading state
-            const form = this;
-            const submitButton = form.querySelector('input[type="submit"]');
-            const originalValue = submitButton.value;
-            
-            form.classList.add('loading');
-            submitButton.value = 'Submitting...';
-            
-            var formData = new FormData(this);
-            var xhr = new XMLHttpRequest();
-            
-            xhr.open('POST', '/submit_info', true);
-            
-            xhr.onload = function() {
-                // Remove loading state
-                form.classList.remove('loading');
-                submitButton.value = originalValue;
-                
-                if (xhr.status === 200) {
-                    var response = JSON.parse(xhr.responseText);
-                    alert(response.message);
-                    if (response.status === "success") {
-                        window.location.href = '/'; // redirect to home page after successful submission
-                    }
-                } else {
-                    alert('An error occurred while submitting the form.');
+<script>
+    document.getElementById('infoForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        var formData = new FormData(this);
+        var xhr = new XMLHttpRequest();
+
+        xhr.open('POST', '/submit_info', true);
+
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                alert(response.message);
+                if (response.status === "success") {
+                    window.location.href = '/'; // redirect to home page after successful submission
                 }
-            };
-            
-            xhr.onerror = function() {
-                // Remove loading state on error
-                form.classList.remove('loading');
-                submitButton.value = originalValue;
+            } else {
                 alert('An error occurred while submitting the form.');
-            };
-            
-            xhr.send(formData);
-        });
-    </script>
+            }
+        };
+
+        xhr.send(formData);
+    });
+</script>
+
 </body>
 </html>
